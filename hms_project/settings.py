@@ -85,6 +85,8 @@ DATABASES = {
     }
 }
 
+# Replace 'hms_app' with the actual name of your Django app folder
+AUTH_USER_MODEL = 'hms_app.User'
 
 # Password validation
 # https://docs.djangoproject.com/en/5.0/ref/settings/#auth-password-validators
