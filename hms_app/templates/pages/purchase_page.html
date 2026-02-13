@@ -1,0 +1,72 @@
+<html>
+<head>
+    <title>Purchase Herb - HMS</title>
+    {% load static %}
+    <link href="{% static 'src/styles.css' %}" rel="stylesheet" />
+</head>
+
+<body class="bg-gray-50 flex flex-col min-h-screen">
+    {% include 'components/_navbar.html' %}
+
+    <main class="flex-grow container mx-auto px-6 py-12">
+        <div class="max-w-4xl mx-auto grid grid-cols-1 md:grid-cols-2 gap-8">
+            
+            <div class="bg-white p-8 rounded-2xl shadow-sm border border-gray-100">
+                <span class="text-xs font-bold uppercase tracking-widest text-blue-600">Batch Details</span>
+                <h1 class="text-4xl font-bold text-gray-900 mt-2 mb-4">{{ batch.name }}</h1>
+                
+                <div class="space-y-4">
+                    <div class="flex justify-between border-b pb-2">
+                        <span class="text-gray-500">Collector</span>
+                        <span class="font-bold text-gray-800">{{ batch.collector.username }}</span>
+                    </div>
+                    <div class="flex justify-between border-b pb-2">
+                        <span class="text-gray-500">Region</span>
+                        <span class="font-bold text-gray-800">{{ batch.collector.collector_info.region }}</span>
+                    </div>
+                    <div class="flex justify-between border-b pb-2">
+                        <span class="text-gray-500">Available Stock</span>
+                        <span class="font-bold text-emerald-700">{{ batch.remaining_quantity }} kg</span>
+                    </div>
+                    <div class="flex justify-between border-b pb-2">
+                        <span class="text-gray-500">Harvest Date</span>
+                        <span class="font-bold text-gray-800">{{ batch.harvest_date }}</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="bg-white p-8 rounded-2xl shadow-xl border-t-4 border-blue-600">
+                <h2 class="text-2xl font-bold text-gray-900 mb-6">Complete Purchase</h2>
+
+                <form method="POST" class="space-y-6">
+                    {% csrf_token %}
+                    
+                    <div>
+                        <label class="block text-sm font-bold text-gray-700">Quantity to Buy (kg)</label>
+                        <input type="number" step="0.01" name="quantity" min="0.01" max="{{ batch.remaining_quantity }}" required 
+                               placeholder="Enter amount in kg"
+                               class="w-full mt-1 p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none">
+                        <p class="text-xs text-gray-400 mt-1">You can purchase up to {{ batch.remaining_quantity }} kg.</p>
+                    </div>
+
+                    <div>
+                        <label class="block text-sm font-bold text-gray-700">Calculated Total Price (NPR)</label>
+                        <input type="number" name="total_price" required placeholder="Negotiated Total"
+                               class="w-full mt-1 p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none">
+                    </div>
+
+                    <button type="submit" class="w-full bg-blue-600 text-white font-bold py-4 rounded-xl hover:bg-blue-700 shadow-lg transition transform active:scale-95">
+                        Confirm Transaction
+                    </button>
+                    
+                    <a href="/marketplace/" class="block text-center text-sm text-gray-500 hover:text-gray-800 font-medium mt-4">
+                        Back to Marketplace
+                    </a>
+                </form>
+            </div>
+        </div>
+    </main>
+
+    {% include 'components/_footer.html' %}
+</body>
+</html>

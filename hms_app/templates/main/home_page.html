@@ -38,6 +38,64 @@
                     </a>
                 </div>
 
+                <div class="mt-12">
+                    <h2 class="text-xl font-bold text-gray-800 mb-4 flex items-center">
+                        <span class="mr-2">🔔</span> Incoming Purchase Requests
+                    </h2>
+
+                    <div class="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
+                        <table class="w-full text-left">
+                            <thead class="bg-gray-50 border-b border-gray-100 text-gray-500 text-xs uppercase font-bold">
+                                <tr>
+                                    <th class="px-6 py-4">Retailer</th>
+                                    <th class="px-6 py-4">Herb</th>
+                                    <th class="px-6 py-4">Requested Qty</th>
+                                    <th class="px-6 py-4">Offer Price</th>
+                                    <th class="px-6 py-4 text-center">Action</th>
+                                </tr>
+                            </thead>
+                            <tbody class="divide-y divide-gray-50">
+                                {% for req in pending_requests %}
+                                <tr class="hover:bg-gray-50 transition">
+                                    <td class="px-6 py-4">
+                                        <div class="font-medium text-gray-900">{{ req.retailer.username }}</div>
+                                        <div class="text-xs text-gray-500">{{ req.retailer.phone }}</div>
+                                    </td>
+                                    <td class="px-6 py-4">
+                                        <span class="font-bold text-emerald-800">{{ req.batch.name }}</span>
+                                    </td>
+                                    <td class="px-6 py-4 font-semibold text-gray-700">{{ req.quantity_bought }} kg</td>
+                                    <td class="px-6 py-4 text-gray-900 font-bold">NPR {{ req.total_price }}</td>
+                                    <td class="px-6 py-4">
+                                        <div class="flex justify-center gap-3">
+                                            <form action="/approve/{{ req.id }}/" method="POST" class="m-0">
+                                                {% csrf_token %}
+                                                <button type="submit" class="bg-emerald-600 hover:bg-emerald-700 text-white px-4 py-2 rounded-lg text-sm font-bold transition">
+                                                    Approve
+                                                </button>
+                                            </form>
+                                            
+                                            <form action="/reject/{{ req.id }}/" method="POST" class="m-0">
+                                                {% csrf_token %}
+                                                <button type="submit" class="bg-red-50 hover:bg-red-100 text-red-600 px-4 py-2 rounded-lg text-sm font-bold transition">
+                                                    Reject
+                                                </button>
+                                            </form>
+                                        </div>
+                                    </td>
+                                </tr>
+                                {% empty %}
+                                <tr>
+                                    <td colspan="5" class="px-6 py-12 text-center text-gray-400 italic">
+                                        No pending purchase requests at the moment.
+                                    </td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
             {% elif user.role == "RETAILER" %}
                 <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
                     <div class="bg-white p-6 rounded-xl shadow-sm border border-blue-100">
