@@ -1,0 +1,76 @@
+<html>
+<head>
+    <title>Profile - {{ user.username }}</title>
+    {% load static %}
+    <link href="{% static 'src/styles.css' %}" rel="stylesheet" />
+</head>
+<body class="bg-gray-50 flex flex-col min-h-screen">
+    {% include 'components/_navbar.html' %}
+
+    <main class="flex-grow container mx-auto px-6 py-12">
+        <div class="max-w-3xl mx-auto bg-white rounded-3xl shadow-sm border border-gray-100 overflow-hidden">
+            <div class="bg-emerald-800 p-8 text-white">
+                <div class="flex items-center justify-between">
+                    <div class="flex items-center space-x-4">
+                        <div class="bg-emerald-600 h-20 w-20 rounded-full flex items-center justify-center text-3xl font-bold">
+                            {{ user.username|first|upper }}
+                        </div>
+                        <div>
+                            <h1 class="text-3xl font-bold">{{ user.username }}</h1>
+                            <p class="text-emerald-200">{{ user.get_role_display }}</p>
+                        </div>
+                    </div>
+                    <form action="/logout/" method="post" class="m-0">
+                        {% csrf_token %}
+                        <button type="submit" class="bg-white/10 hover:bg-white/20 px-4 py-2 rounded-lg font-bold transition">
+                            Logout
+                        </button>
+                    </form>
+                </div>
+            </div>
+
+            <div class="p-8">
+                <h2 class="text-xl font-bold text-gray-800 mb-6">Profile Details</h2>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-10">
+                    <div>
+                        <p class="text-sm text-gray-400 uppercase font-bold">Email Address</p>
+                        <p class="text-gray-700 font-medium">{{ user.email|default:"Not Provided" }}</p>
+                    </div>
+                    <div>
+                        <p class="text-sm text-gray-400 uppercase font-bold">Phone Number</p>
+                        <p class="text-gray-700 font-medium">{{ user.phone|default:"Not Provided" }}</p>
+                    </div>
+                    {% if user.role == "COLLECTOR" %}
+                    <div>
+                        <p class="text-sm text-gray-400 uppercase font-bold">Harvesting Region</p>
+                        <p class="text-gray-700 font-medium">{{ user.collector_info.region }}</p>
+                    </div>
+                    {% elif user.role == "RETAILER" %}
+                    <div>
+                        <p class="text-sm text-gray-400 uppercase font-bold">Shop Name</p>
+                        <p class="text-gray-700 font-medium">{{ user.retailer_info.shop_name }}</p>
+                    </div>
+                    {% endif %}
+                </div>
+
+                <hr class="border-gray-100 mb-8">
+
+                <div class="flex flex-col sm:flex-row gap-4">
+                    <a href="/profile/edit/" class="flex-1 bg-emerald-700 text-white text-center py-3 rounded-xl font-bold hover:bg-emerald-800 transition">
+                        Edit Profile
+                    </a>
+                    
+                    <form action="/profile/delete/" method="POST" class="flex-1 m-0" onsubmit="return confirm('Are you sure you want to delete your account? This cannot be undone.');">
+                        {% csrf_token %}
+                        <button type="submit" class="w-full bg-red-50 text-red-600 py-3 rounded-xl font-bold hover:bg-red-100 transition">
+                            Delete Account
+                        </button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    {% include 'components/_footer.html' %}
+</body>
+</html>

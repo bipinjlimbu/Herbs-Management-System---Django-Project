@@ -96,22 +96,66 @@
                     </div>
                 </div>
 
-            {% elif user.role == "RETAILER" %}
-                <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
-                    <div class="bg-white p-6 rounded-xl shadow-sm border border-blue-100">
-                        <h3 class="text-gray-500 text-sm font-bold uppercase">Shop Name</h3>
-                        <p class="text-2xl font-bold text-blue-800">{{ user.retailer_info.shop_name }}</p>
-                    </div>
-                    <div class="bg-white p-6 rounded-xl shadow-sm border border-blue-100">
-                        <h3 class="text-gray-500 text-sm font-bold uppercase">Inventory Items</h3>
-                        <p class="text-2xl font-bold text-blue-800">{{ inventory_count|default:0 }}</p>
-                    </div>
-                    <a href="/marketplace/" class="bg-blue-700 p-6 rounded-xl shadow-md text-white flex items-center justify-center hover:bg-blue-800 transition">
-                        <span class="text-xl font-bold">Browse Marketplace</span>
-                    </a>
+        {% elif user.role == "RETAILER" %}
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                <div class="bg-white p-6 rounded-xl shadow-sm border border-blue-100">
+                    <h3 class="text-gray-500 text-sm font-bold uppercase">Shop Name</h3>
+                    <p class="text-2xl font-bold text-blue-800">{{ user.retailer_info.shop_name }}</p>
                 </div>
-            {% endif %}
+                <div class="bg-white p-6 rounded-xl shadow-sm border border-blue-100">
+                    <h3 class="text-gray-500 text-sm font-bold uppercase">Inventory Items</h3>
+                    <p class="text-2xl font-bold text-blue-800">{{ inventory_count|default:0 }}</p>
+                </div>
+                <a href="/marketplace/" class="bg-blue-700 p-6 rounded-xl shadow-md text-white flex items-center justify-center hover:bg-blue-800 transition">
+                    <span class="text-xl font-bold">Browse Marketplace</span>
+                </a>
+            </div>
 
+            <div class="mt-12">
+                <h2 class="text-xl font-bold text-gray-800 mb-4 flex items-center">
+                    <span class="mr-2">⏳</span> My Pending Purchases
+                </h2>
+
+                <div class="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
+                    <table class="w-full text-left">
+                        <thead class="bg-blue-50 border-b border-blue-100 text-blue-900 text-xs uppercase font-bold">
+                            <tr>
+                                <th class="px-6 py-4">Collector</th>
+                                <th class="px-6 py-4">Herb</th>
+                                <th class="px-6 py-4">Quantity</th>
+                                <th class="px-6 py-4">Total Price</th>
+                                <th class="px-6 py-4 text-center">Status</th>
+                            </tr>
+                        </thead>
+                        <tbody class="divide-y divide-gray-50">
+                            {% for req in my_pending_requests %}
+                            <tr class="hover:bg-gray-50 transition">
+                                <td class="px-6 py-4">
+                                    <div class="font-medium text-gray-900">{{ req.collector.username }}</div>
+                                    <div class="text-xs text-gray-500">{{ req.collector.phone }}</div>
+                                </td>
+                                <td class="px-6 py-4 font-bold text-blue-800">{{ req.batch.name }}</td>
+                                <td class="px-6 py-4 text-gray-700 font-semibold">{{ req.quantity_bought }} kg</td>
+                                <td class="px-6 py-4 text-gray-900 font-bold">NPR {{ req.total_price }}</td>
+                                <td class="px-6 py-4 text-center">
+                                    <span class="inline-block bg-yellow-100 text-yellow-700 px-3 py-1 rounded-full text-xs font-bold uppercase border border-yellow-200">
+                                        Awaiting Approval
+                                    </span>
+                                </td>
+                            </tr>
+                            {% empty %}
+                            <tr>
+                                <td colspan="5" class="px-6 py-12 text-center text-gray-400 italic">
+                                    You have no pending purchase requests.
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        {% endif %}
+        
         {% else %}
             <div class="bg-emerald-50 rounded-3xl p-12 text-center border border-emerald-100">
                 <h2 class="text-3xl font-bold text-emerald-900 mb-4">The Digital Bridge for Herb Trade</h2>
