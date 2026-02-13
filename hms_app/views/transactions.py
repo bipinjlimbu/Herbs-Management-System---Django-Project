@@ -72,3 +72,17 @@ def reject_transaction(request, transaction_id):
             messages.error(request, "This transaction has already been processed.")
             
     return redirect('/')
+
+@login_required
+def transaction_history_view(request):
+    # Fetching history based on user role
+    if request.user.role == "COLLECTOR":
+        # All requests sent TO this collector
+        transactions = Transaction.objects.filter(collector=request.user).order_by('-timestamp')
+    else:
+        # All requests sent BY this retailer
+        transactions = Transaction.objects.filter(retailer=request.user).order_by('-timestamp')
+    
+    return render(request, 'pages/transactions.html', {
+        'transactions': transactions
+    })

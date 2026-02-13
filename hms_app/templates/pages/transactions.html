@@ -1,0 +1,83 @@
+<html>
+<head>
+    <title>Transactions - HMS</title>
+    {% load static %}
+    <link href="{% static 'src/styles.css' %}" rel="stylesheet" />
+</head>
+
+<body class="bg-gray-50 flex flex-col min-h-screen">
+    {% include 'components/_navbar.html' %}
+
+    <main class="flex-grow container mx-auto px-6 py-10">
+        <div class="mb-8">
+            <h1 class="text-3xl font-bold text-gray-900">Transaction History</h1>
+            <p class="text-gray-600">
+                {% if user.role == "COLLECTOR" %}
+                    Monitor your sales and pending approval requests.
+                {% else %}
+                    Track your purchase requests and their status.
+                {% endif %}
+            </p>
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-4 gap-4 mb-8">
+            <div class="bg-white p-4 rounded-xl shadow-sm border border-gray-100">
+                <p class="text-xs font-bold text-gray-400 uppercase">Total Transactions</p>
+                <p class="text-xl font-bold text-gray-800">{{ transactions.count }}</p>
+            </div>
+        </div>
+
+        <div class="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
+            <table class="w-full text-left">
+                <thead class="bg-gray-50 border-b border-gray-100 text-gray-500 text-xs uppercase font-bold">
+                    <tr>
+                        <th class="px-6 py-4">ID & Date</th>
+                        <th class="px-6 py-4">Herb</th>
+                        <th class="px-6 py-4">{% if user.role == "COLLECTOR" %}Buyer{% else %}Seller{% endif %}</th>
+                        <th class="px-6 py-4">Quantity</th>
+                        <th class="px-6 py-4">Total Amount</th>
+                        <th class="px-6 py-4">Status</th>
+                    </tr>
+                </thead>
+                <tbody class="divide-y divide-gray-50">
+                    {% for tx in transactions %}
+                    <tr class="hover:bg-gray-50 transition">
+                        <td class="px-6 py-4">
+                            <div class="text-sm font-bold text-gray-900">#TX-{{ tx.id }}</div>
+                            <div class="text-xs text-gray-400">{{ tx.timestamp|date:"d M Y, H:i" }}</div>
+                        </td>
+                        <td class="px-6 py-4 font-medium text-emerald-800">{{ tx.batch.name }}</td>
+                        <td class="px-6 py-4">
+                            {% if user.role == "COLLECTOR" %}
+                                {{ tx.retailer.username }}
+                            {% else %}
+                                {{ tx.collector.username }}
+                            {% endif %}
+                        </td>
+                        <td class="px-6 py-4 text-gray-700">{{ tx.quantity_bought }} kg</td>
+                        <td class="px-6 py-4 font-bold text-gray-900">NPR {{ tx.total_price }}</td>
+                        <td class="px-6 py-4 text-sm">
+                            {% if tx.status == "APPROVED" %}
+                                <span class="px-3 py-1 bg-green-100 text-green-700 rounded-full font-bold text-xs uppercase">Approved</span>
+                            {% elif tx.status == "REJECTED" %}
+                                <span class="px-3 py-1 bg-red-100 text-red-600 rounded-full font-bold text-xs uppercase">Rejected</span>
+                            {% else %}
+                                <span class="px-3 py-1 bg-yellow-100 text-yellow-700 rounded-full font-bold text-xs uppercase">Pending</span>
+                            {% endif %}
+                        </td>
+                    </tr>
+                    {% empty %}
+                    <tr>
+                        <td colspan="6" class="px-6 py-12 text-center text-gray-400">
+                            No transaction history found.
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </main>
+
+    {% include 'components/_footer.html' %}
+</body>
+</html>
