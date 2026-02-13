@@ -1,7 +1,8 @@
 from django.shortcuts import render, redirect
 from django.contrib.auth.decorators import login_required
 from django.contrib import messages
-from ..models import HerbBatch
+from django.db.models import Sum
+from ..models import HerbBatch, RetailerInventory
 
 @login_required
 def add_herb_view(request):
@@ -45,3 +46,19 @@ def marketplace_view(request):
     return render(request, 'pages/marketplace.html', {
         'available_batches': available_batches
     })
+    
+@login_required
+def my_stock_view(request):
+    context = {}
+    if request.user.role == "COLLECTOR":
+        # Collectors usually track specific batches for harvest dates
+        context['collector_stock'] = HerbBatch.objects.filter(collector=request.user)
+    else:
+        # RETAILER: Group by herb_name and sum the current_stock
+        context['retailer_stock'] = RetailerInventory.objects.filter(
+            retailer=request.user
+        ).values('herb_name').annotate(
+            total_quantity=Sum('current_stock')
+        ).order_by('herb_name')
+        
+    return render(request, 'pages/my_stock.html', context)

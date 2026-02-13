@@ -1,0 +1,78 @@
+<html>
+<head>
+    <title>My Stock - HMS</title>
+    {% load static %}
+    <link href="{% static 'src/styles.css' %}" rel="stylesheet" />
+</head>
+
+<body class="bg-gray-50 flex flex-col min-h-screen">
+    {% include 'components/_navbar.html' %}
+
+    <main class="flex-grow container mx-auto px-6 py-10">
+        <div class="mb-8">
+            <h1 class="text-3xl font-bold text-gray-900">Current Stock Inventory</h1>
+            <p class="text-gray-600">
+                {% if user.role == "COLLECTOR" %}
+                    Manage your harvested herb batches and availability.
+                {% else %}
+                    Manage total herb stock available in your shop.
+                {% endif %}
+            </p>
+        </div>
+
+        <div class="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
+            <table class="w-full text-left">
+                <thead class="{% if user.role == 'COLLECTOR' %}bg-emerald-50 text-emerald-900{% else %}bg-blue-50 text-blue-900{% endif %} border-b font-bold text-xs uppercase">
+                    <tr>
+                        <th class="px-6 py-4">Herb Name</th>
+                        <th class="px-6 py-4">{% if user.role == "COLLECTOR" %}Remaining Qty{% else %}Total Stock{% endif %}</th>
+                        {% if user.role == "COLLECTOR" %}
+                            <th class="px-6 py-4">Harvest Date</th>
+                        {% endif %}
+                        <th class="px-6 py-4">Status</th>
+                    </tr>
+                </thead>
+                <tbody class="divide-y divide-gray-50">
+                    {% if user.role == "COLLECTOR" %}
+                        {% for batch in collector_stock %}
+                        <tr class="hover:bg-gray-50">
+                            <td class="px-6 py-4 font-bold text-gray-900">{{ batch.name }}</td>
+                            <td class="px-6 py-4 font-semibold text-emerald-700">{{ batch.remaining_quantity }} kg</td>
+                            <td class="px-6 py-4 text-sm text-gray-500">{{ batch.harvest_date }}</td>
+                            <td class="px-6 py-4">
+                                {% if batch.is_available %}
+                                    <span class="bg-green-100 text-green-700 px-3 py-1 rounded-full text-xs font-bold uppercase">In Market</span>
+                                {% else %}
+                                    <span class="bg-gray-100 text-gray-500 px-3 py-1 rounded-full text-xs font-bold uppercase">Private/Sold</span>
+                                {% endif %}
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    {% else %}
+                        {% for item in retailer_stock %}
+                        <tr class="hover:bg-gray-50 transition">
+                            <td class="px-6 py-4">
+                                <div class="flex items-center">
+                                    <span class="text-xl mr-3">🌿</span>
+                                    <span class="font-bold text-gray-900">{{ item.herb_name }}</span>
+                                </div>
+                            </td>
+                            <td class="px-6 py-4 font-semibold text-blue-700">
+                                {{ item.total_quantity }} kg
+                            </td>
+                            <td class="px-6 py-4">
+                                <span class="bg-blue-100 text-blue-700 px-3 py-1 rounded-full text-xs font-bold uppercase">
+                                    In Shop
+                                </span>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    {% endif %}                 
+                </tbody>
+            </table>
+        </div>
+    </main>
+
+    {% include 'components/_footer.html' %}
+</body>
+</html>
