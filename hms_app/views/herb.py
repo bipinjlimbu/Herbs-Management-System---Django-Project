@@ -34,3 +34,14 @@ def my_collections_view(request):
     batches = HerbBatch.objects.filter(collector=request.user).order_by('-harvest_date')
     
     return render(request, 'pages/my_collections.html', {'batches': batches}) 
+
+def marketplace_view(request):
+    # Filter for available batches with remaining stock > 0
+    available_batches = HerbBatch.objects.filter(
+        is_available=True, 
+        remaining_quantity__gt=0
+    ).order_by('-harvest_date')
+    
+    return render(request, 'pages/marketplace.html', {
+        'available_batches': available_batches
+    })

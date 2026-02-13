@@ -1,0 +1,64 @@
+<html>
+<head>
+    <title>Marketplace - HMS</title>
+    {% load static %}
+    <link href="{% static 'src/styles.css' %}" rel="stylesheet" />
+</head>
+
+<body class="bg-gray-50 flex flex-col min-h-screen">
+    {% include 'components/_navbar.html' %}
+
+    <main class="flex-grow container mx-auto px-6 py-10">
+        
+        <div class="mb-10 flex flex-col md:flex-row md:items-center md:justify-between gap-4">
+            <div>
+                <h1 class="text-3xl font-bold text-gray-900">Herb Marketplace</h1>
+                <p class="text-gray-600 font-medium">Browse fresh harvests from local collectors.</p>
+            </div>
+            <div class="relative">
+                <input type="text" placeholder="Search herbs..." class="pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none w-full md:w-64">
+                <span class="absolute left-3 top-2.5 text-gray-400">🔍</span>
+            </div>
+        </div>
+
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-8">
+            {% for batch in available_batches %}
+                <div class="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden hover:shadow-md transition-shadow">
+                    <div class="h-40 bg-emerald-50 flex items-center justify-center relative">
+                        <span class="text-5xl">🌿</span>
+                        <span class="absolute top-3 right-3 bg-white px-2 py-1 rounded-md text-xs font-bold text-emerald-700 shadow-sm border border-emerald-100">
+                            {{ batch.remaining_quantity }} kg left
+                        </span>
+                    </div>
+
+                    <div class="p-5">
+                        <h3 class="text-xl font-bold text-gray-900 mb-1">{{ batch.name }}</h3>
+                        <p class="text-xs text-gray-500 uppercase font-bold tracking-wider mb-3">Collector: {{ batch.collector.username }}</p>
+                        
+                        <div class="space-y-2 mb-6">
+                            <div class="flex justify-between text-sm">
+                                <span class="text-gray-500">Harvest Date:</span>
+                                <span class="text-gray-900 font-medium">{{ batch.harvest_date }}</span>
+                            </div>
+                            <div class="flex justify-between text-sm">
+                                <span class="text-gray-500">Region:</span>
+                                <span class="text-gray-900 font-medium">{{ batch.collector.collector_info.region }}</span>
+                            </div>
+                        </div>
+
+                        <a href="/purchase/{{ batch.id }}/" class="block w-full text-center bg-blue-600 text-white font-bold py-3 rounded-xl hover:bg-blue-700 transition transform active:scale-95 shadow-sm">
+                            Buy from Batch
+                        </a>
+                    </div>
+                </div>
+            {% empty %}
+                <div class="col-span-full py-20 text-center">
+                    <p class="text-gray-400 text-xl font-medium">No herbs are currently available in the market.</p>
+                </div>
+            {% endfor %}
+        </div>
+    </main>
+
+    {% include 'components/_footer.html' %}
+</body>
+</html>
