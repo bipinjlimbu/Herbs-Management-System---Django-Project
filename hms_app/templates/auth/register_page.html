@@ -1,0 +1,128 @@
+<html>
+<head>
+    <title>Register - HMS</title>
+    {% load static %}
+    <link href="{% static 'src/styles.css' %}" rel="stylesheet" />
+    <style>
+        .hidden-fields { display: none; }
+        .active-tab { background-color: white; color: #065f46; box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1); }
+    </style>
+</head>
+
+<body class="bg-gray-50 flex flex-col min-h-screen">
+    {% include 'components/_navbar.html' %}
+
+    <main class="flex-grow flex items-center justify-center py-12 px-4">
+        <div class="max-w-2xl w-full bg-white p-8 rounded-2xl shadow-xl border border-gray-100">
+            
+            <div class="text-center mb-10">
+                <h2 class="text-3xl font-bold text-emerald-900 tracking-tight">Create Your Account</h2>
+                <p class="text-gray-500 mt-2">Join the herbal supply chain network</p>
+            </div>
+
+            <form method="POST" action="/register/" class="space-y-6">
+                {% csrf_token %}
+
+                <div class="flex gap-2 p-1.5 bg-gray-100 rounded-2xl">
+                    <label class="flex-1 cursor-pointer">
+                        <input type="radio" name="role" value="COLLECTOR" class="hidden peer" checked onchange="toggleFields('COLLECTOR')">
+                        <div class="text-center py-3 rounded-xl font-bold transition-all peer-checked:bg-white peer-checked:text-emerald-700 peer-checked:shadow-sm text-gray-500">
+                            🌿 Collector
+                        </div>
+                    </label>
+                    <label class="flex-1 cursor-pointer">
+                        <input type="radio" name="role" value="RETAILER" class="hidden peer" onchange="toggleFields('RETAILER')">
+                        <div class="text-center py-3 rounded-xl font-bold transition-all peer-checked:bg-white peer-checked:text-emerald-700 peer-checked:shadow-sm text-gray-500">
+                            🏪 Retailer
+                        </div>
+                    </label>
+                </div>
+
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-5">
+                    <div>
+                        <label class="block text-sm font-bold text-gray-700">First Name</label>
+                        <input type="text" name="fname" required class="w-full mt-1 p-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-emerald-500 outline-none">
+                    </div>
+                    <div>
+                        <label class="block text-sm font-bold text-gray-700">Last Name</label>
+                        <input type="text" name="lname" required class="w-full mt-1 p-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-emerald-500 outline-none">
+                    </div>
+                    <div>
+                        <label class="block text-sm font-bold text-gray-700">Email Address</label>
+                        <input type="email" name="email" required class="w-full mt-1 p-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-emerald-500 outline-none">
+                    </div>
+                    <div>
+                        <label class="block text-sm font-bold text-gray-700">Phone Number</label>
+                        <input type="text" name="phone" required class="w-full mt-1 p-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-emerald-500 outline-none">
+                    </div>
+                    <div>
+                        <label class="block text-sm font-bold text-gray-700">Username</label>
+                        <input type="text" name="username" required class="w-full mt-1 p-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-emerald-500 outline-none">
+                    </div>
+                    <div>
+                        <label class="block text-sm font-bold text-gray-700">Password</label>
+                        <input type="password" name="password" required class="w-full mt-1 p-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-emerald-500 outline-none">
+                    </div>
+                </div>
+
+                <div class="border-t border-gray-100 pt-6">
+                    <div id="collector-section" class="space-y-4">
+                        <h4 class="text-emerald-800 font-bold text-sm uppercase tracking-widest">Collector Criteria</h4>
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                            <div>
+                                <label class="block text-sm font-bold text-gray-700">Collection Region</label>
+                                <input type="text" name="region" placeholder="e.g., Himalayan Range" class="w-full mt-1 p-2.5 border border-gray-300 rounded-lg outline-none focus:ring-2 focus:ring-emerald-500">
+                            </div>
+                            <div>
+                                <label class="block text-sm font-bold text-gray-700">License ID</label>
+                                <input type="text" name="license_id" class="w-full mt-1 p-2.5 border border-gray-300 rounded-lg outline-none focus:ring-2 focus:ring-emerald-500">
+                            </div>
+                        </div>
+                    </div>
+
+                    <div id="retailer-section" class="space-y-4 hidden-fields">
+                        <h4 class="text-emerald-800 font-bold text-sm uppercase tracking-widest">Retailer Criteria</h4>
+                        <div class="space-y-4">
+                            <div>
+                                <label class="block text-sm font-bold text-gray-700">Shop Name</label>
+                                <input type="text" name="shop_name" class="w-full mt-1 p-2.5 border border-gray-300 rounded-lg outline-none focus:ring-2 focus:ring-emerald-500">
+                            </div>
+                            <div>
+                                <label class="block text-sm font-bold text-gray-700">Business Address</label>
+                                <textarea name="address" rows="2" class="w-full mt-1 p-2.5 border border-gray-300 rounded-lg outline-none focus:ring-2 focus:ring-emerald-500"></textarea>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <button type="submit" class="w-full bg-emerald-700 text-white font-bold py-4 rounded-xl hover:bg-emerald-800 shadow-lg transform transition active:scale-[0.98]">
+                    Complete Registration
+                </button>
+            </form>
+
+            <div class="mt-6 text-center text-sm text-gray-600">
+                Already have an account? 
+                <a href="/login/" class="text-emerald-700 font-bold hover:underline">Login here</a>
+            </div>
+        </div>
+    </main>
+
+    {% include 'components/_footer.html' %}
+
+    <script>
+        function toggleFields(role) {
+            const collectorSec = document.getElementById('collector-section');
+            const retailerSec = document.getElementById('retailer-section');
+
+            if (role === 'COLLECTOR') {
+                collectorSec.classList.remove('hidden-fields');
+                retailerSec.classList.add('hidden-fields');
+                // Ensure inputs are required or not based on visibility if needed
+            } else {
+                retailerSec.classList.remove('hidden-fields');
+                collectorSec.classList.add('hidden-fields');
+            }
+        }
+    </script>
+</body>
+</html>

@@ -30,14 +30,14 @@
 
                     <div class="flex items-center ml-4 space-x-4 border-l border-emerald-700 pl-4">
                         <span class="text-emerald-300 text-sm italic">{{ user.username }} ({{ user.role }})</span>
-                        <form action="" method="post" class="m-0">
+                        <form action="/logout/" method="post" class="m-0">
                             {% csrf_token %}
                             <button type="submit" class="text-red-400 hover:text-red-300 font-bold text-sm">Logout</button>
                         </form>
                     </div>
 
                 {% else %}
-                    <a href="" class="hover:text-emerald-200 transition">Login</a>
+                    <a href="/login/" class="hover:text-emerald-200 transition">Login</a>
                     <a href="/register/" class="bg-white text-emerald-800 px-4 py-2 rounded font-bold hover:bg-gray-100 transition">Register</a>
                 {% endif %}
             </div>
