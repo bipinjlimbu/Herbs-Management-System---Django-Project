@@ -1,0 +1,61 @@
+<html>
+<head>
+    <title>Edit Profile - HMS</title>
+    {% load static %}
+    <link href="{% static 'src/styles.css' %}" rel="stylesheet" />
+</head>
+<body class="bg-gray-50 flex flex-col min-h-screen">
+    {% include 'components/_navbar.html' %}
+
+    <main class="flex-grow container mx-auto px-6 py-12">
+        <div class="max-w-2xl mx-auto bg-white rounded-3xl shadow-sm border border-gray-100 overflow-hidden">
+            <div class="p-8 border-b border-gray-50">
+                <h1 class="text-2xl font-bold text-gray-900">Edit Your Profile</h1>
+                <p class="text-gray-500 text-sm">Update your contact information and account details.</p>
+            </div>
+
+            <form method="POST" class="p-8 space-y-6">
+                {% csrf_token %}
+                
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div class="space-y-2">
+                        <label class="text-sm font-bold text-gray-700">Email Address</label>
+                        <input type="email" name="email" value="{{ user.email }}" 
+                               class="w-full p-3 rounded-xl border border-gray-200 focus:ring-2 focus:ring-emerald-500 outline-none transition">
+                    </div>
+                    <div class="space-y-2">
+                        <label class="text-sm font-bold text-gray-700">Phone Number</label>
+                        <input type="text" name="phone" value="{{ user.phone }}" 
+                               class="w-full p-3 rounded-xl border border-gray-200 focus:ring-2 focus:ring-emerald-500 outline-none transition">
+                    </div>
+                </div>
+
+                {% if user.role == "COLLECTOR" %}
+                <div class="space-y-2">
+                    <label class="text-sm font-bold text-gray-700">Harvesting Region</label>
+                    <input type="text" name="region" value="{{ user.collector_info.region }}" 
+                           class="w-full p-3 rounded-xl border border-gray-200 focus:ring-2 focus:ring-emerald-500 outline-none transition">
+                </div>
+                {% elif user.role == "RETAILER" %}
+                <div class="space-y-2">
+                    <label class="text-sm font-bold text-gray-700">Shop Name</label>
+                    <input type="text" name="shop_name" value="{{ user.retailer_info.shop_name }}" 
+                           class="w-full p-3 rounded-xl border border-gray-200 focus:ring-2 focus:ring-blue-500 outline-none transition">
+                </div>
+                {% endif %}
+
+                <div class="pt-6 flex items-center justify-end space-x-4">
+                    <a href="/profile/{{ user.id }}/" class="text-gray-500 font-bold hover:text-gray-700 transition">
+                        Cancel
+                    </a>
+                    <button type="submit" class="bg-emerald-700 text-white px-8 py-3 rounded-xl font-bold hover:bg-emerald-800 shadow-lg shadow-emerald-700/20 transition">
+                        Save Changes
+                    </button>
+                </div>
+            </form>
+        </div>
+    </main>
+
+    {% include 'components/_footer.html' %}
+</body>
+</html>

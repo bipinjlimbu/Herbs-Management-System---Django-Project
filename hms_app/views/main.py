@@ -34,6 +34,31 @@ def profile_view(request, user_id):
     return render(request, 'main/profile_page.html')
 
 @login_required
+def edit_profile_view(request):
+    user = request.user
+    
+    if request.method == "POST":
+        # 1. Update Base User Fields
+        user.email = request.POST.get('email')
+        user.phone = request.POST.get('phone')
+        user.save()
+
+        # 2. Update Role-Specific Fields
+        if user.role == "COLLECTOR":
+            info = user.collector_info
+            info.region = request.POST.get('region')
+            info.save()
+        elif user.role == "RETAILER":
+            info = user.retailer_info
+            info.shop_name = request.POST.get('shop_name')
+            info.save()
+
+        messages.success(request, "Profile updated successfully!")
+        return redirect(f'/profile/{user.id}/')
+
+    return render(request, 'main/edit_profile_page.html')
+
+@login_required
 def delete_profile(request):
     if request.method == "POST":
         user = request.user
