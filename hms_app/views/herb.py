@@ -27,3 +27,10 @@ def add_herb_view(request):
         return redirect('/') 
     
     return render(request, 'pages/add_herb.html')
+
+@login_required
+def my_collections_view(request):
+    # Fetch batches where the collector is the logged-in user
+    batches = HerbBatch.objects.filter(collector=request.user).order_by('-harvest_date')
+    
+    return render(request, 'pages/my_collections.html', {'batches': batches}) 
