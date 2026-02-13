@@ -17,8 +17,7 @@ def home_view(request):
             context['inventory_count'] = RetailerInventory.objects.filter(
                 retailer=request.user
             ).values('herb_name').distinct().count()
-            
-            # Add this line to get the Retailer's sent requests
+
             context['my_pending_requests'] = Transaction.objects.filter(
                 retailer=request.user, status='PENDING'
             ).order_by('-timestamp')
@@ -27,7 +26,6 @@ def home_view(request):
 
 @login_required
 def profile_view(request, user_id):
-    # Security: Only allow users to view their own profile for now
     if request.user.id != user_id:
         return redirect(f'/profile/{request.user.id}/')
         
@@ -38,12 +36,10 @@ def edit_profile_view(request):
     user = request.user
     
     if request.method == "POST":
-        # 1. Update Base User Fields
         user.email = request.POST.get('email')
         user.phone = request.POST.get('phone')
         user.save()
 
-        # 2. Update Role-Specific Fields
         if user.role == "COLLECTOR":
             info = user.collector_info
             info.region = request.POST.get('region')
@@ -62,8 +58,8 @@ def edit_profile_view(request):
 def delete_profile(request):
     if request.method == "POST":
         user = request.user
-        logout(request) # Log them out first
-        user.delete()   # Delete the user from DB
+        logout(request) 
+        user.delete()  
         messages.success(request, "Your account has been permanently deleted.")
         return redirect('/')
     return redirect('profile_view', user_id=request.user.id)

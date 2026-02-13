@@ -31,24 +31,19 @@ def add_herb_view(request):
 
 @login_required
 def my_collections_view(request):
-    # Fetch batches where the collector is the logged-in user
     batches = HerbBatch.objects.filter(collector=request.user).order_by('-harvest_date')
     
     return render(request, 'pages/my_collections.html', {'batches': batches}) 
 
 def marketplace_view(request):
-    # 1. Start with your existing base filters
     available_batches = HerbBatch.objects.filter(
         is_available=True, 
         remaining_quantity__gt=0
     ).order_by('-harvest_date')
     
-    # 2. Check if a search query exists in the URL
     query = request.GET.get('q')
     
     if query:
-        # 3. Apply search filter on top of the existing availability filters
-        # This searches both the herb name and the collector's region
         available_batches = available_batches.filter(
             Q(name__icontains=query) | 
             Q(collector__collector_info__region__icontains=query)
@@ -63,10 +58,8 @@ def marketplace_view(request):
 def my_stock_view(request):
     context = {}
     if request.user.role == "COLLECTOR":
-        # Collectors usually track specific batches for harvest dates
         context['collector_stock'] = HerbBatch.objects.filter(collector=request.user)
     else:
-        # RETAILER: Group by herb_name and sum the current_stock
         context['retailer_stock'] = RetailerInventory.objects.filter(
             retailer=request.user
         ).values('herb_name').annotate(

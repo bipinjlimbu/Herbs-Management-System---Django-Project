@@ -11,7 +11,6 @@ def purchase_request_view(request, batch_id):
         qty = float(request.POST.get('quantity'))
         price = request.POST.get('total_price')
 
-        # Just create the request, do NOT subtract stock yet
         Transaction.objects.create(
             collector=batch.collector,
             retailer=request.user,
@@ -33,7 +32,6 @@ def approve_transaction(request, transaction_id):
         messages.error(request, "This transaction has already been processed.")
         return redirect('/')
 
-    # 1. Deduct stock from the actual Batch
     batch = tx.batch
     if batch.remaining_quantity >= tx.quantity_bought:
         batch.remaining_quantity -= tx.quantity_bought
@@ -41,11 +39,9 @@ def approve_transaction(request, transaction_id):
             batch.is_available = False
         batch.save()
 
-        # 2. Update Transaction Status
         tx.status = 'APPROVED'
         tx.save()
 
-        # 3. Add to Retailer's Inventory
         RetailerInventory.objects.create(
             retailer=tx.retailer,
             herb_name=batch.name,
@@ -60,7 +56,6 @@ def approve_transaction(request, transaction_id):
 
 @login_required
 def reject_transaction(request, transaction_id):
-    # Ensure only the collector assigned to this transaction can reject it
     tx = get_object_or_404(Transaction, id=transaction_id, collector=request.user)
     
     if request.method == 'POST':
@@ -77,16 +72,13 @@ def reject_transaction(request, transaction_id):
 def transaction_history_view(request):
     status_filter = request.GET.get('status')
     
-    # 1. Start with the role-based filter
     if request.user.role == "COLLECTOR":
         transactions = Transaction.objects.filter(collector=request.user)
     else:
         transactions = Transaction.objects.filter(retailer=request.user)
     
-    # 2. STRICKLY EXCLUDE PENDING: This hides pending from the "All" view too
     transactions = transactions.exclude(status='PENDING')
     
-    # 3. Apply status filter for Approved/Rejected if clicked
     if status_filter and status_filter != 'ALL':
         transactions = transactions.filter(status=status_filter)
         
