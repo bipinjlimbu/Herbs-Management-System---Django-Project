@@ -15,10 +15,13 @@
                 <h1 class="text-3xl font-bold text-gray-900">Herb Marketplace</h1>
                 <p class="text-gray-600 font-medium">Browse fresh harvests from local collectors.</p>
             </div>
-            <div class="relative">
-                <input type="text" placeholder="Search herbs..." class="pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none w-full md:w-64">
-                <span class="absolute left-3 top-2.5 text-gray-400">🔍</span>
-            </div>
+            <form method="GET" action="/marketplace/" class="relative">
+                    <input type="text" name="q" placeholder="Search herbs..." 
+                        value="{{ request.GET.q }}"
+                        class="pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none w-full md:w-64">
+                    <span class="absolute left-3 top-2.5 text-gray-400">🔍</span>
+                    <button type="submit" class="hidden"></button>
+            </form>
         </div>
 
         <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-8">

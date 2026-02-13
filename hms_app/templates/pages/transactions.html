@@ -1,6 +1,6 @@
 <html>
 <head>
-    <title>Transactions - HMS</title>
+    <title>Transaction History - HMS</title>
     {% load static %}
     <link href="{% static 'src/styles.css' %}" rel="stylesheet" />
 </head>
@@ -10,20 +10,35 @@
 
     <main class="flex-grow container mx-auto px-6 py-10">
         <div class="mb-8">
-            <h1 class="text-3xl font-bold text-gray-900">Transaction History</h1>
+            <h1 class="text-3xl font-bold text-gray-900">Finalized Transactions</h1>
             <p class="text-gray-600">
                 {% if user.role == "COLLECTOR" %}
-                    Monitor your sales and pending approval requests.
+                    A permanent record of your approved sales and rejected offers.
                 {% else %}
-                    Track your purchase requests and their status.
+                    A history of your completed purchases and declined requests.
                 {% endif %}
             </p>
         </div>
 
-        <div class="grid grid-cols-1 md:grid-cols-4 gap-4 mb-8">
-            <div class="bg-white p-4 rounded-xl shadow-sm border border-gray-100">
-                <p class="text-xs font-bold text-gray-400 uppercase">Total Transactions</p>
-                <p class="text-xl font-bold text-gray-800">{{ transactions.count }}</p>
+        <div class="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-8">
+            <div class="flex bg-white border border-gray-200 p-1 rounded-xl shadow-sm w-fit">
+                <a href="?status=ALL" 
+                   class="px-5 py-2 rounded-lg text-sm font-bold transition {% if current_filter == 'ALL' %}bg-emerald-800 text-white{% else %}text-gray-500 hover:bg-gray-50{% endif %}">
+                   All Records
+                </a>
+                <a href="?status=APPROVED" 
+                   class="px-5 py-2 rounded-lg text-sm font-bold transition {% if current_filter == 'APPROVED' %}bg-green-600 text-white{% else %}text-gray-500 hover:bg-gray-50{% endif %}">
+                   Approved
+                </a>
+                <a href="?status=REJECTED" 
+                   class="px-5 py-2 rounded-lg text-sm font-bold transition {% if current_filter == 'REJECTED' %}bg-red-600 text-white{% else %}text-gray-500 hover:bg-gray-50{% endif %}">
+                   Rejected
+                </a>
+            </div>
+
+            <div class="bg-white px-6 py-3 rounded-xl border border-gray-100 shadow-sm">
+                <span class="text-xs font-bold text-gray-400 uppercase mr-3">Total Finalized</span>
+                <span class="text-xl font-bold text-emerald-800">{{ transactions.count }}</span>
             </div>
         </div>
 
@@ -32,11 +47,11 @@
                 <thead class="bg-gray-50 border-b border-gray-100 text-gray-500 text-xs uppercase font-bold">
                     <tr>
                         <th class="px-6 py-4">ID & Date</th>
-                        <th class="px-6 py-4">Herb</th>
-                        <th class="px-6 py-4">{% if user.role == "COLLECTOR" %}Buyer{% else %}Seller{% endif %}</th>
-                        <th class="px-6 py-4">Quantity</th>
+                        <th class="px-6 py-4">Herb Name</th>
+                        <th class="px-6 py-4">{% if user.role == "COLLECTOR" %}Buyer (Retailer){% else %}Seller (Collector){% endif %}</th>
+                        <th class="px-6 py-4 text-center">Quantity</th>
                         <th class="px-6 py-4">Total Amount</th>
-                        <th class="px-6 py-4">Status</th>
+                        <th class="px-6 py-4 text-center">Final Status</th>
                     </tr>
                 </thead>
                 <tbody class="divide-y divide-gray-50">
@@ -46,30 +61,47 @@
                             <div class="text-sm font-bold text-gray-900">#TX-{{ tx.id }}</div>
                             <div class="text-xs text-gray-400">{{ tx.timestamp|date:"d M Y, H:i" }}</div>
                         </td>
-                        <td class="px-6 py-4 font-medium text-emerald-800">{{ tx.batch.name }}</td>
+                        
+                        <td class="px-6 py-4 font-medium text-emerald-800">
+                            {{ tx.batch.name }}
+                        </td>
+                        
                         <td class="px-6 py-4">
                             {% if user.role == "COLLECTOR" %}
-                                {{ tx.retailer.username }}
+                                <div class="font-medium text-gray-900">{{ tx.retailer.username }}</div>
+                                <div class="text-xs text-gray-500">{{ tx.retailer.phone }}</div>
                             {% else %}
-                                {{ tx.collector.username }}
+                                <div class="font-medium text-gray-900">{{ tx.collector.username }}</div>
+                                <div class="text-xs text-gray-500">{{ tx.collector.phone }}</div>
                             {% endif %}
                         </td>
-                        <td class="px-6 py-4 text-gray-700">{{ tx.quantity_bought }} kg</td>
-                        <td class="px-6 py-4 font-bold text-gray-900">NPR {{ tx.total_price }}</td>
-                        <td class="px-6 py-4 text-sm">
+                        
+                        <td class="px-6 py-4 text-center text-gray-700 font-semibold">
+                            {{ tx.quantity_bought }} kg
+                        </td>
+                        
+                        <td class="px-6 py-4 font-bold text-gray-900">
+                            NPR {{ tx.total_price }}
+                        </td>
+                        
+                        <td class="px-6 py-4 text-center">
                             {% if tx.status == "APPROVED" %}
-                                <span class="px-3 py-1 bg-green-100 text-green-700 rounded-full font-bold text-xs uppercase">Approved</span>
+                                <span class="px-3 py-1 bg-green-100 text-green-700 rounded-full font-bold text-xs uppercase border border-green-200">
+                                    Approved
+                                </span>
                             {% elif tx.status == "REJECTED" %}
-                                <span class="px-3 py-1 bg-red-100 text-red-600 rounded-full font-bold text-xs uppercase">Rejected</span>
-                            {% else %}
-                                <span class="px-3 py-1 bg-yellow-100 text-yellow-700 rounded-full font-bold text-xs uppercase">Pending</span>
+                                <span class="px-3 py-1 bg-red-100 text-red-600 rounded-full font-bold text-xs uppercase border border-red-200">
+                                    Rejected
+                                </span>
                             {% endif %}
                         </td>
                     </tr>
                     {% empty %}
                     <tr>
-                        <td colspan="6" class="px-6 py-12 text-center text-gray-400">
-                            No transaction history found.
+                        <td colspan="6" class="px-6 py-16 text-center">
+                            <div class="text-gray-300 text-5xl mb-4">📂</div>
+                            <p class="text-gray-400 text-lg">No finalized transactions match your filter.</p>
+                            <a href="?status=ALL" class="text-emerald-700 font-bold hover:underline">Clear all filters</a>
                         </td>
                     </tr>
                     {% endfor %}

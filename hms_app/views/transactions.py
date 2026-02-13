@@ -75,14 +75,24 @@ def reject_transaction(request, transaction_id):
 
 @login_required
 def transaction_history_view(request):
-    # Fetching history based on user role
+    status_filter = request.GET.get('status')
+    
+    # 1. Start with the role-based filter
     if request.user.role == "COLLECTOR":
-        # All requests sent TO this collector
-        transactions = Transaction.objects.filter(collector=request.user).order_by('-timestamp')
+        transactions = Transaction.objects.filter(collector=request.user)
     else:
-        # All requests sent BY this retailer
-        transactions = Transaction.objects.filter(retailer=request.user).order_by('-timestamp')
+        transactions = Transaction.objects.filter(retailer=request.user)
+    
+    # 2. STRICKLY EXCLUDE PENDING: This hides pending from the "All" view too
+    transactions = transactions.exclude(status='PENDING')
+    
+    # 3. Apply status filter for Approved/Rejected if clicked
+    if status_filter and status_filter != 'ALL':
+        transactions = transactions.filter(status=status_filter)
+        
+    transactions = transactions.order_by('-timestamp')
     
     return render(request, 'pages/transactions.html', {
-        'transactions': transactions
+        'transactions': transactions,
+        'current_filter': status_filter or 'ALL'
     })
